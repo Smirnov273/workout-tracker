@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Трекер тренировок Вани</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <style>
+        :root {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #050816;
+            color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            padding: 16px 12px 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 8px 12px 12px;
+            border-radius: 16px;
+            background: radial-gradient(circle at top left, #3b82f6 0, #050816 50%);
+            margin-bottom: 12px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        header p {
+            margin: 4px 0 0;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .date-label {
+            margin-top: 6px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 8px 4px;
+            border-radius: 10px;
+            border: 0;
+            background: #111827;
+            color: #e5e7eb;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #3b82f6, #a855f7);
+            color: #f9fafb;
+        }
+
+        main {
+            flex: 1;
+            background: #020617;
+            border-radius: 16px;
+            padding: 12px;
+            overflow-y: auto;
+        }
+
+        section {
+            display: none;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin: 0 0 10px;
+        }
+
+        label {
+            font-size: 13px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid #1f2937;
+            background: #020617;
+            color: #f9fafb;
+            font-size: 13px;
+        }
+
+        textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: 1px solid #3b82f6;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            border: 0;
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #f9fafb;
+        }
+
+        .btn-secondary {
+            background: #111827;
+            color: #e5e7eb;
+        }
+
+        .btn-small {
+            font-size: 12px;
+            padding: 6px 8px;
+            width: auto;
+        }
+
+        .exercise-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 4px;
+        }
+
+        .exercise-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: #020617;
+            border: 1px solid #111827;
+            margin-bottom: 6px;
+        }
+
+        .exercise-item label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .exercise-meta {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0;
+        }
+
+        .history-item {
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: #020617;
+            border: 1px solid #111827;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .history-date {
+            font-size: 12px;
+            opacity: 0.85;
+        }
+
+        .history-note {
+            margin-top: 4px;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .chip {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #0f172a;
+            font-size: 11px;
+            margin-right: 4px;
+            margin-top: 3px;
+        }
+
+        .muted {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .block {
+            margin-bottom: 12px;
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .row > * {
+            flex: 1;
+        }
+
+        .tagline {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .hint {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 999px;
+            background: #0f172a;
+            font-size: 10px;
+            margin-left: 6px;
+        }
+
+        .empty-state {
+            font-size: 13px;
+            opacity: 0.8;
+            padding: 4px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <header>
+        <h1>Трекер тренировок</h1>
+        <p>Для Вани. Храни прогресс, а не отмазки 💪</p>
+        <div class="date-label" id="header-date"></div>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-button active" data-tab="today">Сегодня</button>
+        <button class="tab-button" data-tab="programs">Программы</button>
+        <button class="tab-button" data-tab="history">История</button>
+    </div>
+
+    <main>
+        <!-- Сегодня -->
+        <section id="screen-today" class="active">
+            <h2>Тренировка сегодня</h2>
+
+            <div class="block">
+                <label for="today-workout-select">Выбери программу</label>
+                <select id="today-workout-select"></select>
+                <div class="hint">Программы можно менять и создавать на вкладке «Программы».</div>
+            </div>
+
+            <div class="block">
+                <label>Упражнения (отметь, что сделал)</label>
+                <ul class="exercise-list" id="today-exercise-list"></ul>
+            </div>
+
+            <div class="block">
+                <label for="today-note">Заметка к тренировке (самочувствие, веса и т.п.)</label>
+                <textarea id="today-note" placeholder="Например: увеличил вес в жиме лёжа до 70 кг"></textarea>
+            </div>
+
+            <button class="btn btn-primary" id="btn-save-today">Записать тренировку</button>
+            <div class="hint">Все тренировки сохраняются только на твоём устройстве.</div>
+        </section>
+
+        <!-- Программы -->
+        <section id="screen-programs">
+            <h2>Мои программы</h2>
+
+            <div class="block">
+                <p class="tagline">Создай свои схемы: «Грудь/трицепс», «Спина/бицепс», «Ноги» и т.д.</p>
+            </div>
+
+            <div class="block">
+                <label for="new-workout-name">Название программы</label>
+                <input id="new-workout-name" type="text" placeholder="Например: Грудь + трицепс">
+                <button class="btn btn-secondary" id="btn-add-workout">Добавить программу</button>
+            </div>
+
+            <div class="block">
+                <label for="exercise-workout-select">К какой программе добавить упражнение</label>
+                <select id="exercise-workout-select"></select>
+            </div>
+
+            <div class="block">
+                <label for="exercise-name">Название упражнения</label>
+                <input id="exercise-name" type="text" placeholder="Например: Жим лёжа">
+            </div>
+
+            <div class="block row">
+                <div>
+                    <label for="exercise-sets">Подходы</label>
+                    <input id="exercise-sets" type="number" min="1" max="20" value="4">
+                </div>
+                <div>
+                    <label for="exercise-reps">Повторения</label>
+                    <input id="exercise-reps" type="number" min="1" max="100" value="8">
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" id="btn-add-exercise">Добавить упражнение</button>
+
+            <div class="block">
+                <h3 style="font-size:15px;margin:12px 0 6px;">Список программ</h3>
+                <div id="programs-list"></div>
+            </div>
+        </section>
+
+        <!-- История -->
+        <section id="screen-history">
+            <h2>История тренировок</h2>
+            <p class="tagline">Чем больше строк здесь, тем сильнее ты становишься.</p>
+            <ul class="history-list" id="history-list"></ul>
+        </section>
+    </main>
+</div>
+
+<script>
+    const STORAGE_KEY = "vanya_workout_tracker_v1";
+
+    const $ = (selector) => document.querySelector(selector);
+
+    let state = {
+        workouts: [],
+        history: []
+    };
+
+    function uuid() {
+        return Math.random().toString(36).substring(2, 9) + Date.now().toString(36).substring(5);
+    }
+
+    function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadState() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+            // Стартовый набор программ по умолчанию
+            state = {
+                workouts: [
+                    {
+                        id: uuid(),
+                        name: "Грудь + трицепс",
+                        exercises: [
+                            { id: uuid(), name: "Жим лёжа", sets: 4, reps: 8 },
+                            { id: uuid(), name: "Разводка гантелей", sets: 3, reps: 12 },
+                            { id: uuid(), name: "Французский жим", sets: 3, reps: 10 }
+                        ]
+                    },
+                    {
+                        id: uuid(),
+                        name: "Спина + бицепс",
+                        exercises: [
+                            { id: uuid(), name: "Тяга вертикального блока", sets: 4, reps: 10 },
+                            { id: uuid(), name: "Тяга штанги в наклоне", sets: 4, reps: 8 },
+                            { id: uuid(), name: "Подъём штанги на бицепс", sets: 3, reps: 10 }
+                        ]
+                    },
+                    {
+                        id: uuid(),
+                        name: "Ноги",
+                        exercises: [
+                            { id: uuid(), name: "Приседания", sets: 4, reps: 8 },
+                            { id: uuid(), name: "Жим ногами", sets: 4, reps: 10 },
+                            { id: uuid(), name: "Сгибание ног", sets: 3, reps: 12 }
+                        ]
+                    }
+                ],
+                history: []
+            };
+            saveState();
+        } else {
+            try {
+                state = JSON.parse(raw);
+            } catch (e) {
+                console.error("Ошибка чтения state, сбрасываю", e);
+                localStorage.removeItem(STORAGE_KEY);
+                loadState();
+            }
+        }
+    }
+
+    function formatDateLabel(date = new Date()) {
+        const days = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
+        const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+
+        const dayName = days[date.getDay()];
+        const d = date.getDate();
+        const m = months[date.getMonth()];
+        const y = date.getFullYear();
+
+        return `${dayName}, ${d} ${m} ${y} г.`;
+    }
+
+    function todayISO() {
+        const d = new Date();
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function timeHM(date = new Date()) {
+        const h = String(date.getHours()).padStart(2, "0");
+        const m = String(date.getMinutes()).padStart(2, "0");
+        return `${h}:${m}`;
+    }
+
+    function setActiveTab(tabId) {
+        document.querySelectorAll(".tab-button").forEach(btn => {
+            btn.classList.toggle("active", btn.dataset.tab === tabId);
+        });
+        document.querySelectorAll("main section").forEach(sec => {
+            sec.classList.toggle("active", sec.id === "screen-" + tabId);
+        });
+    }
+
+    function renderWorkoutSelects() {
+        const selects = [$("#today-workout-select"), $("#exercise-workout-select")];
+        selects.forEach(sel => {
+            sel.innerHTML = "";
+            state.workouts.forEach(w => {
+                const opt = document.createElement("option");
+                opt.value = w.id;
+                opt.textContent = w.name;
+                sel.appendChild(opt);
+            });
+        });
+    }
+
+    function getCurrentTodayWorkoutId() {
+        const sel = $("#today-workout-select");
+        return sel.value || (state.workouts[0] && state.workouts[0].id) || null;
+    }
+
+    function renderTodayExercises() {
+        const list = $("#today-exercise-list");
+        list.innerHTML = "";
+
+        if (!state.workouts.length) {
+            list.innerHTML = `<li class="empty-state">Сначала создай хотя бы одну программу на вкладке «Программы».</li>`;
+            return;
+        }
+
+        const workoutId = getCurrentTodayWorkoutId();
+        const workout = state.workouts.find(w => w.id === workoutId);
+        if (!workout) return;
+
+        if (!workout.exercises.length) {
+            list.innerHTML = `<li class="empty-state">В этой программе пока нет упражнений. Добавь их во вкладке «Программы».</li>`;
+            return;
+        }
+
+        workout.exercises.forEach(ex => {
+            const li = document.createElement("li");
+            li.className = "exercise-item";
+            li.innerHTML = `
+                <label>
+                    <input type="checkbox" data-exercise-id="${ex.id}">
+                    <div>
+                        <div>${ex.name}</div>
+                        <div class="exercise-meta">${ex.sets} подходов × ${ex.reps} повторений</div>
+                    </div>
+                </label>
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    function renderProgramsList() {
+        const container = $("#programs-list");
+        container.innerHTML = "";
+
+        if (!state.workouts.length) {
+            container.innerHTML = `<div class="empty-state">Программ пока нет. Создай свою первую схему выше 👆</div>`;
+            return;
+        }
+
+        state.workouts.forEach(w => {
+            const div = document.createElement("div");
+            div.className = "history-item";
+            const exercisesHtml = w.exercises.length
+                ? w.exercises.map(ex => `
+                    <div class="chip">${ex.name} — ${ex.sets}×${ex.reps}</div>
+                `).join("")
+                : `<div class="muted">Пока нет упражнений</div>`;
+
+            div.innerHTML = `
+                <div class="history-item-header">
+                    <span>${w.name}</span>
+                    <span class="badge">${w.exercises.length} упр.</span>
+                </div>
+                <div>${exercisesHtml}</div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function renderHistory() {
+        const list = $("#history-list");
+        list.innerHTML = "";
+
+        if (!state.history.length) {
+            list.innerHTML = `<li class="empty-state">История пока пустая. Время провести первую тренировку 💪</li>`;
+            return;
+        }
+
+        const sorted = [...state.history].sort((a, b) => {
+            const aKey = a.date + " " + (a.time || "00:00");
+            const bKey = b.date + " " + (b.time || "00:00");
+            return aKey < bKey ? 1 : -1;
+        });
+
+        sorted.forEach(record => {
+            const li = document.createElement("li");
+            li.className = "history-item";
+
+            const workout = state.workouts.find(w => w.id === record.workoutId);
+            const workoutName = workout ? workout.name : "Удалённая программа";
+
+            const dateParts = record.date.split("-");
+            const prettyDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
+            const time = record.time || "--:--";
+
+            const exercises = record.exercises && record.exercises.length
+                ? record.exercises.map(name => `<span class="chip">${name}</span>`).join("")
+                : `<span class="muted">Упражнения не отмечены</span>`;
+
+            li.innerHTML = `
+                <div class="history-item-header">
+                    <span>${workoutName}</span>
+                    <span class="history-date">${prettyDate}, ${time}</span>
+                </div>
+                <div>${exercises}</div>
+                ${record.note ? `<div class="history-note">Заметка: ${record.note}</div>` : ""}
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    function addWorkout(name) {
+        if (!name.trim()) return;
+        state.workouts.push({
+            id: uuid(),
+            name: name.trim(),
+            exercises: []
+        });
+        saveState();
+        renderWorkoutSelects();
+        renderProgramsList();
+        renderTodayExercises();
+    }
+
+    function addExerciseToWorkout(workoutId, name, sets, reps) {
+        const workout = state.workouts.find(w => w.id === workoutId);
+        if (!workout) return;
+        workout.exercises.push({
+            id: uuid(),
+            name: name.trim(),
+            sets: sets,
+            reps: reps
+        });
+        saveState();
+        renderProgramsList();
+        renderTodayExercises();
+    }
+
+    function saveTodayWorkout() {
+        if (!state.workouts.length) {
+            alert("Сначала создай хотя бы одну программу на вкладке «Программы».");
+            return;
+        }
+
+        const workoutId = getCurrentTodayWorkoutId();
+        const workout = state.workouts.find(w => w.id === workoutId);
+        if (!workout) {
+            alert("Не удалось найти выбранную программу.");
+            return;
+        }
+
+        const checked = Array.from(document.querySelectorAll("#today-exercise-list input[type=checkbox]:checked"));
+        const doneExerciseNames = checked.map(input => {
+            const exId = input.dataset.exerciseId;
+            const ex = workout.exercises.find(e => e.id === exId);
+            return ex ? ex.name : null;
+        }).filter(Boolean);
+
+        const note = $("#today-note").value.trim();
+        const now = new Date();
+
+        if (doneExerciseNames.length === 0 && !note) {
+            if (!confirm("Ты не отметил ни одного упражнения и не написал заметку. Всё равно сохранить тренировку?")) {
+                return;
+            }
+        }
+
+        state.history.push({
+            id: uuid(),
+            date: todayISO(),
+            time: timeHM(now),
+            workoutId: workoutId,
+            exercises: doneExerciseNames,
+            note: note
+        });
+
+        saveState();
+        $("#today-note").value = "";
+        document.querySelectorAll("#today-exercise-list input[type=checkbox]").forEach(ch => ch.checked = false);
+        renderHistory();
+        alert("Тренировка сохранена! Красавчик 💪");
+    }
+
+    function initTabs() {
+        document.querySelectorAll(".tab-button").forEach(btn => {
+            btn.addEventListener("click", () => {
+                setActiveTab(btn.dataset.tab);
+                if (btn.dataset.tab === "history") {
+                    renderHistory();
+                }
+            });
+        });
+    }
+
+    function initHandlers() {
+        $("#today-workout-select").addEventListener("change", () => {
+            renderTodayExercises();
+        });
+
+        $("#btn-save-today").addEventListener("click", () => {
+            saveTodayWorkout();
+        });
+
+        $("#btn-add-workout").addEventListener("click", () => {
+            const name = $("#new-workout-name").value;
+            if (!name.trim()) {
+                alert("Введи название программы.");
+                return;
+            }
+            addWorkout(name);
+            $("#new-workout-name").value = "";
+        });
+
+        $("#btn-add-exercise").addEventListener("click", () => {
+            if (!state.workouts.length) {
+                alert("Сначала создай программу выше.");
+                return;
+            }
+            const workoutId = $("#exercise-workout-select").value;
+            const name = $("#exercise-name").value;
+            const sets = parseInt($("#exercise-sets").value, 10) || 1;
+            const reps = parseInt($("#exercise-reps").value, 10) || 1;
+
+            if (!name.trim()) {
+                alert("Введи название упражнения.");
+                return;
+            }
+            addExerciseToWorkout(workoutId, name, sets, reps);
+            $("#exercise-name").value = "";
+        });
+    }
+
+    function init() {
+        loadState();
+        $("#header-date").textContent = formatDateLabel(new Date());
+        renderWorkoutSelects();
+        renderTodayExercises();
+        renderProgramsList();
+        renderHistory();
+        initTabs();
+        initHandlers();
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
